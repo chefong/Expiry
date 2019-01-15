@@ -12,3 +12,14 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
     monospace;
 }
+
+@font-face {
+  src: url("./assets/fonts/LeagueGothic-Regular.otf");
+  font-family: "League Gothic";
+}
+
+@font-face {
+  src: url("./assets/fonts/LeagueGothic-Italic.otf");
+  font-family: "League Gothic";
+  font-style: italic;
+}
