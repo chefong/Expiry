@@ -38,7 +38,7 @@ export default class Chart extends Component {
     })
   }
 
-  onHLClick = () => {
+  onHLSelect = () => {
     let data = this.state.couriers
 
     data.sort((a, b) => {
@@ -53,7 +53,7 @@ export default class Chart extends Component {
     this.updateCouriers(data)
   }
 
-  onLHClick = () => {
+  onLHSelect = () => {
     let data = this.state.couriers
 
     data.sort((a, b) => {
@@ -68,7 +68,7 @@ export default class Chart extends Component {
     this.updateCouriers(data)
   }
 
-  onAZClick = () => {
+  onAZSelect = () => {
     let data = this.state.couriers
 
     data.sort((a, b) => {
@@ -83,7 +83,7 @@ export default class Chart extends Component {
     this.updateCouriers(data)
   }
 
-  onZAClick = () => {
+  onZASelect = () => {
     let data = this.state.couriers
 
     data.sort((a, b) => {
@@ -98,6 +98,25 @@ export default class Chart extends Component {
     this.updateCouriers(data)
   }
 
+  handleSubmit = e => {
+    e.preventDefault()
+
+    let sortOption = e.target.sortBy.value
+    switch(sortOption) {
+      case "Low - High":
+        this.onLHSelect()
+        break;
+      case "High - Low":
+        this.onHLSelect()
+        break;
+      case "A - Z":
+        this.onAZSelect()
+        break;
+      default:
+        this.onZASelect()
+    }
+  }
+
   render() {
     return (
       <div className="chart-container">
@@ -108,20 +127,21 @@ export default class Chart extends Component {
             </div>
           </div>
           <div className="filters-container">
-            <div className="row justify-content-center">
-              <div className="col-md-2">
-                <button type="button" className="btn btn-secondary" onClick={ this.onHLClick }>High - Low</button>
+            <form onSubmit={ this.handleSubmit }>
+              <div class="row justify-content-center">
+                <div class="col-md-2">
+                  <select className="form-control" id="sortBy">
+                    <option>Low - High</option>
+                    <option>High - Low</option>
+                    <option>A - Z</option>
+                    <option>Z - A</option>
+                  </select>
+                </div>
+                <div className="col-md-1">
+                  <button type="submit" className="btn btn-secondary">Submit</button>
+                </div>
               </div>
-              <div className="col-md-2">
-                <button type="button" className="btn btn-secondary" onClick={ this.onLHClick }>Low - High</button>
-              </div>
-              <div className="col-md-2">
-                <button type="button" className="btn btn-secondary" onClick={ this.onAZClick }>A - Z</button>
-              </div>
-              <div className="col-md-2">
-                <button type="button" className="btn btn-secondary" onClick={ this.onZAClick }>Z - A</button>
-              </div>
-            </div>
+            </form>
           </div>
           <div className="bar-container">
             <div class="row justify-content-center">
@@ -138,6 +158,13 @@ export default class Chart extends Component {
                       ]
                     }
                   }
+                  options={
+                    {
+                      legend: {
+                        display: false
+                      }
+                    }
+                }
                 /> }
               </div>
             </div>
