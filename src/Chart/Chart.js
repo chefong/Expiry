@@ -1,23 +1,32 @@
 import React, { Component } from 'react'
 import { HorizontalBar } from 'react-chartjs-2'
+import { defaults } from 'react-chartjs-2'
+import Info from '../Info/Info'
 import './Chart.css'
+
+// Edited Chart JS's default font settings
+defaults.global.defaultFontFamily = 'League Gothic'
+defaults.global.defaultFontSize = 16
 
 const d3 = require("d3-fetch")
 const csvFile = require('../data.csv')
 const green = "#99cc94"
+const darkGreenA = "rgb(115, 209, 107)"
+const darkGreenB = "rgb(13, 158, 0)"
+const darkRedA = "rgb(255, 46, 49)"
 const red = "#e66668"
 const options = {
-                  legend: {
-                    display: false
-                  },
-                  scales: {
-                    xAxes: [{
-                        ticks: {
-                            beginAtZero: true
-                        }
-                    }]
-                  }
-                }
+  legend: {
+    display: false
+  },
+  scales: {
+    xAxes: [{
+      ticks: {
+        beginAtZero: true
+      }
+    }]
+  }
+}
 
 export default class Chart extends Component {
   state = {
@@ -145,9 +154,29 @@ export default class Chart extends Component {
     }
   }
 
+  setElementColor = (activeIndex, elementColor) => {
+    let colors = [...this.state.colors]
+    console.log(elementColor)
+    if (elementColor == darkGreenA) {
+      colors[activeIndex] = "#13a706"
+    }
+    else if (elementColor == darkGreenB) {
+      colors[activeIndex] = green
+    }
+    else if (elementColor == darkRedA) {
+      colors[activeIndex] = "#b6070a"
+    }
+    else {
+      colors[activeIndex] = red
+    }
+    this.setState({ colors })
+  }
+
   handleElementClick = e => {
-    if (e[0]) {
-      let activeIndex = e[0]._index
+    let chartElement = e[0]
+
+    if (chartElement) {
+      let activeIndex = chartElement._index
       let activeCurrent = this.state.currents[activeIndex]
       let activeSpace = this.state.max - activeCurrent
       activeSpace = activeSpace.toFixed(1)
@@ -155,16 +184,13 @@ export default class Chart extends Component {
       activeSpace < 0.0 ? this.setState({ overloaded: true }) : this.setState({ overloaded: false })
 
       this.setState({ activeIndex, activeCurrent, activeSpace })
+
+      let elementColor = chartElement._model.backgroundColor
+      this.setElementColor(activeIndex, elementColor)
     }
   }
 
   render() {
-    // Set the "space available" color depending on overload status
-    let classColor = "grey"
-    if (this.state.overloaded) {
-      classColor = "red"
-    }
-
     return (
       <div className="chart-container">
         <div className="container-fluid">
@@ -186,24 +212,12 @@ export default class Chart extends Component {
               </div>
             </div>
             <div className="col-md-5">
-              <div class="info-container">
-                <div className="row">
-                  <div className="col-md-5">
-                    <p className="info">Maximum: { this.state.max }%</p>
-                  </div>
-                  <div className="col-md-5">
-                    <p className="info">Space Available: <span className={ classColor }>{ this.state.activeSpace }%</span></p>
-                  </div>
-                </div>
-                <div className="row">
-                  <div className="col-md-5">
-                    <p className="info">Current: { this.state.activeCurrent }%</p>
-                  </div>
-                  <div className="col-md-5">
-                    { this.state.overloaded && <p className="info" id="overloaded">OVERLOADED!</p> }
-                  </div>
-                </div>
-              </div>
+              <Info 
+                overloaded={ this.state.overloaded }
+                max={ this.state.max }
+                activeCurrent={ this.state.activeCurrent }
+                activeSpace={ this.state.activeSpace }
+              />
             </div>
           </div>
           <div className="bar-container">
@@ -213,12 +227,10 @@ export default class Chart extends Component {
                   data={
                     {
                       labels: this.state.names,
-                      datasets: [
-                        {
-                          backgroundColor: this.state.colors,
-                          data: this.state.currents
-                        }
-                      ]
+                      datasets: [{
+                        backgroundColor: this.state.colors,
+                        data: this.state.currents
+                      }]
                     }
                   }
                   options={ options }

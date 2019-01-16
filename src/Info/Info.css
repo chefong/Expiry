@@ -1,0 +1,20 @@
+.info-container {
+  margin-top: 2%;
+  padding-right: 0%
+}
+
+.info {
+  font-family: "League Gothic";
+  font-size: 150%;
+  color: #505050;
+  font-style: italic;
+  float: left
+}
+
+.red {
+  color: #e66668
+}
+
+.green {
+  color: #76b670
+}

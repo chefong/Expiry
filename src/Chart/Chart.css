@@ -31,24 +31,3 @@ option {
 .form-inline {
   margin-bottom: 2%;
 }
-
-.info-container {
-  margin-top: 2%;
-  padding-right: 0%
-}
-
-.info {
-  font-family: "League Gothic";
-  font-size: 150%;
-  color: #505050;
-  font-style: italic;
-  float: left
-}
-
-.grey {
-  color: #505050
-}
-
-.red {
-  color: #e66668
-}
