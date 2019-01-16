@@ -8,7 +8,7 @@ const Info = props => {
   }
 
   return (
-    <div class="info-container">
+    <div className="info-container">
       <div className="row">
         <div className="col-md-5">
           <p className="info">Maximum: { props.max }%</p>

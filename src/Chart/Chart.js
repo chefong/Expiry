@@ -42,9 +42,9 @@ export default class Chart extends Component {
     activeCurrent: undefined,
     activeSpace: undefined,
     activeOverload: undefined,
-    totalLoad: 0,
-    totalMax: 0,
-    selectedIndices: []
+    selectedTotalLoad: 0,
+    selectedIndices: [],
+    largestMax: undefined
   }
 
   updateCouriers = data => {
@@ -157,27 +157,47 @@ export default class Chart extends Component {
     }
   }
 
+  setLargestMax = selectedIndices => {
+    let maxes = this.state.maxes
+    let largestMax = maxes[selectedIndices[0]]
+
+    for (let i = 0; i < selectedIndices.length; ++i) {
+      let index = selectedIndices[i]
+      if (maxes[index] > largestMax) {
+        largestMax = maxes[index]
+      }
+    }
+    console.log(largestMax)
+    this.setState({ largestMax })
+  }
+
   setElementColor = (activeIndex, elementColor) => {
     let colors = [...this.state.colors]
     let loadValue = this.state.loads[activeIndex]
     let maxValue = this.state.maxes[activeIndex]
-    let totalLoad = this.state.totalLoad
-    let totalMax = this.state.totalMax
+    let selectedTotalLoad = this.state.selectedTotalLoad
     let selectedIndices = [...this.state.selectedIndices]
 
-    if (elementColor == darkGreenA) {
+    if (elementColor == darkGreenA) { // If the green bar element is selected
       colors[activeIndex] = "#13a706"
       selectedIndices.push(activeIndex)
 
-      totalLoad += loadValue
-      totalMax += maxValue
+      if (selectedIndices.length == 1)  {
+        console.log(maxValue)
+        this.setState({ largestMax: maxValue })
+      }
+      else {
+        this.setLargestMax(selectedIndices)
+      }
+
+      selectedTotalLoad += loadValue
     }
-    else if (elementColor == darkGreenB) {
+    else if (elementColor == darkGreenB) { // If the green bar element is deselected
       colors[activeIndex] = green
       selectedIndices.splice(selectedIndices.indexOf(activeIndex))
+      this.setLargestMax(selectedIndices)
 
-      totalLoad -= loadValue
-      totalMax -= maxValue
+      selectedTotalLoad -= loadValue
     }
     else if (elementColor == darkRedA) {
       colors[activeIndex] = "#b6070a"
@@ -186,10 +206,11 @@ export default class Chart extends Component {
       colors[activeIndex] = red
     }
 
-    let totalCurrent = (totalLoad / totalMax) * 100
-    totalCurrent = totalCurrent.toFixed(1)
     console.log(selectedIndices)
-    this.setState({ colors, totalLoad, totalMax, selectedIndices })
+
+    console.log("selectedTotalLoad", selectedTotalLoad)
+
+    this.setState({ colors, selectedTotalLoad, selectedIndices })
   }
 
   handleElementClick = e => {
@@ -216,7 +237,7 @@ export default class Chart extends Component {
         <div className="container-fluid">
           <div className="row justify-content-center">
             <div className="col-md-7">
-              <div class="row justify-content-center">
+              <div className="row justify-content-center">
                 <h1 id="chart-name">Loading Capacities</h1>
               </div>
               <div className="row justify-content-center">
