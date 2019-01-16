@@ -7,7 +7,7 @@
 }
 
 .bar-container {
-  margin-bottom: 5%;
+  margin-bottom: 2%;
 }
 
 .btn-secondary {
@@ -30,4 +30,8 @@ option {
 
 .form-inline {
   margin-bottom: 2%;
+}
+
+.merge-container {
+  height: 100px;
 }

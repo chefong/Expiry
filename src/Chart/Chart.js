@@ -61,8 +61,7 @@ export default class Chart extends Component {
       loads.push(parseInt(data[i].Load))
       maxes.push(parseInt(data[i].Max))
 
-      let current = (data[i].Load / data[i].Max) * 100
-      current = current.toFixed(1)
+      let current = ((data[i].Load / data[i].Max) * 100).toFixed(1)
 
       currents.push(current)
 
@@ -215,12 +214,13 @@ export default class Chart extends Component {
 
   handleElementClick = e => {
     let chartElement = e[0]
+    let currents = this.state.currents
+    let max = this.state.max
 
     if (chartElement) {
       let activeIndex = chartElement._index
-      let activeCurrent = this.state.currents[activeIndex]
-      let activeSpace = this.state.max - activeCurrent
-      activeSpace = activeSpace.toFixed(1)
+      let activeCurrent = currents[activeIndex]
+      let activeSpace = (max - activeCurrent).toFixed(1)
       
       activeSpace < 0.0 ? this.setState({ overloaded: true }) : this.setState({ overloaded: false })
 
@@ -229,6 +229,16 @@ export default class Chart extends Component {
       let elementColor = chartElement._model.backgroundColor
       this.setElementColor(activeIndex, elementColor)
     }
+  }
+
+  handleMergeClick = e => {
+    e.preventDefault()
+
+    let selectedTotalLoad = this.state.selectedTotalLoad
+    let largestMax = this.state.largestMax
+    let newLoadValue = ((selectedTotalLoad / largestMax) * 100).toFixed(1)
+    
+    if (newLoadValue > 90) alert("overload")
   }
 
   render() {
@@ -278,6 +288,11 @@ export default class Chart extends Component {
                   getElementAtEvent={ this.handleElementClick }
                 /> }
               </div>
+            </div>
+          </div>
+          <div className="merge-container">
+            <div className="row justify-content-center">
+              { this.state.selectedIndices.length > 1 && <button className="btn btn-secondary" onClick={ this.handleMergeClick }>Merge</button> }
             </div>
           </div>
         </div>
