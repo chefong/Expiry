@@ -41,7 +41,10 @@ export default class Chart extends Component {
     activeIndex: undefined,
     activeCurrent: undefined,
     activeSpace: undefined,
-    activeOverload: undefined
+    activeOverload: undefined,
+    totalLoad: 0,
+    totalMax: 0,
+    selectedIndices: []
   }
 
   updateCouriers = data => {
@@ -55,8 +58,8 @@ export default class Chart extends Component {
     for (let i = 0; i < data.length; ++i) {
       couriers.push(data[i])
       names.push(data[i].Name)
-      loads.push(data[i].Load)
-      maxes.push(data[i].Max)
+      loads.push(parseInt(data[i].Load))
+      maxes.push(parseInt(data[i].Max))
 
       let current = (data[i].Load / data[i].Max) * 100
       current = current.toFixed(1)
@@ -156,12 +159,25 @@ export default class Chart extends Component {
 
   setElementColor = (activeIndex, elementColor) => {
     let colors = [...this.state.colors]
-    console.log(elementColor)
+    let loadValue = this.state.loads[activeIndex]
+    let maxValue = this.state.maxes[activeIndex]
+    let totalLoad = this.state.totalLoad
+    let totalMax = this.state.totalMax
+    let selectedIndices = [...this.state.selectedIndices]
+
     if (elementColor == darkGreenA) {
       colors[activeIndex] = "#13a706"
+      selectedIndices.push(activeIndex)
+
+      totalLoad += loadValue
+      totalMax += maxValue
     }
     else if (elementColor == darkGreenB) {
       colors[activeIndex] = green
+      selectedIndices.splice(selectedIndices.indexOf(activeIndex))
+
+      totalLoad -= loadValue
+      totalMax -= maxValue
     }
     else if (elementColor == darkRedA) {
       colors[activeIndex] = "#b6070a"
@@ -169,7 +185,11 @@ export default class Chart extends Component {
     else {
       colors[activeIndex] = red
     }
-    this.setState({ colors })
+
+    let totalCurrent = (totalLoad / totalMax) * 100
+    totalCurrent = totalCurrent.toFixed(1)
+    console.log(selectedIndices)
+    this.setState({ colors, totalLoad, totalMax, selectedIndices })
   }
 
   handleElementClick = e => {
@@ -223,7 +243,7 @@ export default class Chart extends Component {
           <div className="bar-container">
             <div className="row justify-content-center">
               <div className="col-md-10">
-                { this.state.names && this.state.loads && this.state.colors && <HorizontalBar
+                { this.state.names && this.state.loads && this.state.currents && this.state.colors && <HorizontalBar
                   data={
                     {
                       labels: this.state.names,
