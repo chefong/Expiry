@@ -1,8 +1,8 @@
-Name,Load
-Nick,85
-Amit,70
-Joy,81
-Chris,41
-Rob,72
-Neal,99
-Amruta,55
+Name,Load,Max
+Nick,85,90
+Amit,70,90
+Joy,81,100
+Chris,41,90
+Rob,72,100
+Neal,99,100
+Amruta,55,90

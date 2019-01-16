@@ -6,11 +6,41 @@
   font-size: 300%;
 }
 
-.btn {
-  border-radius: 0px
+.bar-container {
+  margin-bottom: 5%;
+}
+
+.btn-secondary {
+  border-radius: 0px;
+  margin-left: 20px
+}
+
+select {
+  max-width: 125%
+}
+
+option {
+  font-family: "League Gothic"
 }
 
 #sortBy, .btn {
   font-family: "League Gothic";
-  letter-spacing: 1px
+  letter-spacing: 1px;
+}
+
+.form-inline {
+  margin-bottom: 2%;
+}
+
+.info-container {
+  margin-top: 2%;
+  padding-right: 0%
+}
+
+.info {
+  font-family: "League Gothic";
+  font-size: 150%;
+  color: #505050;
+  font-style: italic;
+  float: left
 }

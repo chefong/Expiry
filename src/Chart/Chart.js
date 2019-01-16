@@ -4,15 +4,36 @@ import './Chart.css'
 
 const d3 = require("d3-fetch")
 const csvFile = require('../data.csv')
+const grey = "#505050"
 const green = "#99cc94"
 const red = "#e66668"
+const options = {
+                  legend: {
+                    display: false
+                  },
+                  scales: {
+                    xAxes: [{
+                        ticks: {
+                            beginAtZero: true
+                        }
+                    }]
+                  }
+                }
 
 export default class Chart extends Component {
   state = {
     couriers: undefined,
     names: undefined,
     loads: undefined,
-    colors: undefined
+    maxes: undefined,
+    currents: undefined,
+    colors: undefined,
+    max: 90.0,
+    overloaded: false,
+    activeIndex: undefined,
+    activeCurrent: undefined,
+    activeSpace: undefined,
+    activeOverload: undefined
   }
 
   updateCouriers = data => {
@@ -20,16 +41,24 @@ export default class Chart extends Component {
     let names = []
     let loads = []
     let colors = []
+    let maxes = []
+    let currents = []
 
     for (let i = 0; i < data.length; ++i) {
       couriers.push(data[i])
       names.push(data[i].Name)
       loads.push(data[i].Load)
+      maxes.push(data[i].Max)
 
-      data[i].Load <= 100 ? colors.push(green) : colors.push(red)
+      let current = (data[i].Load / data[i].Max) * 100
+      current = current.toFixed(1)
+
+      currents.push(current)
+
+      current <= this.state.max ? colors.push(green) : colors.push(red)
     }
 
-    this.setState({ couriers, names, loads, colors })
+    this.setState({ couriers, names, loads, colors, maxes, currents })
   }
 
   componentDidMount = () => {
@@ -117,35 +146,64 @@ export default class Chart extends Component {
     }
   }
 
+  handleElementClick = e => {
+    if (e[0]) {
+      let activeIndex = e[0]._index
+      let activeCurrent = this.state.currents[activeIndex]
+      let activeSpace = this.state.max - activeCurrent
+      activeSpace = activeSpace.toFixed(1)
+      
+      activeSpace < 0.0 ? this.setState({ overloaded: true }) : this.setState({ overloaded: false })
+
+      this.setState({ activeIndex, activeCurrent, activeSpace })
+    }
+  }
+
   render() {
     return (
       <div className="chart-container">
-        <div class="container-fluid">
-          <div class="row justify-content-center">
-            <div class="col-md-12">
-              <h1 id="chart-name">Loading Capacities</h1>
-            </div>
-          </div>
-          <div className="filters-container">
-            <form onSubmit={ this.handleSubmit }>
+        <div className="container-fluid">
+          <div className="row justify-content-center">
+            <div className="col-md-7">
               <div class="row justify-content-center">
-                <div class="col-md-2">
-                  <select className="form-control" id="sortBy">
+                <h1 id="chart-name">Loading Capacities</h1>
+              </div>
+              <div className="row justify-content-center">
+                <form className="form-inline" onSubmit={ this.handleSubmit }>
+                  <select className="form-control" name="sortBy" id="sortBy">
                     <option>Low - High</option>
                     <option>High - Low</option>
                     <option>A - Z</option>
                     <option>Z - A</option>
                   </select>
-                </div>
-                <div className="col-md-1">
                   <button type="submit" className="btn btn-secondary">Submit</button>
+                </form>
+              </div>
+            </div>
+            <div className="col-md-5">
+              <div class="info-container">
+                <div className="row">
+                  <div className="col-md-5">
+                    <p className="info">Maximum: { this.state.max }%</p>
+                  </div>
+                  <div className="col-md-5">
+                    <p className="info">Space Available: <span id="active-space">{ this.state.activeSpace }%</span></p>
+                  </div>
+                </div>
+                <div className="row">
+                  <div className="col-md-5">
+                    <p className="info">Current: { this.state.activeCurrent }%</p>
+                  </div>
+                  <div className="col-md-5">
+                    { this.state.overloaded && <p className="info" id="overloaded">OVERLOADED!</p> }
+                  </div>
                 </div>
               </div>
-            </form>
+            </div>
           </div>
           <div className="bar-container">
-            <div class="row justify-content-center">
-              <div class="col-md-10">
+            <div className="row justify-content-center">
+              <div className="col-md-10">
                 { this.state.names && this.state.loads && this.state.colors && <HorizontalBar
                   data={
                     {
@@ -153,18 +211,13 @@ export default class Chart extends Component {
                       datasets: [
                         {
                           backgroundColor: this.state.colors,
-                          data: this.state.loads
+                          data: this.state.currents
                         }
                       ]
                     }
                   }
-                  options={
-                    {
-                      legend: {
-                        display: false
-                      }
-                    }
-                }
+                  options={ options }
+                  getElementAtEvent={ this.handleElementClick }
                 /> }
               </div>
             </div>
