@@ -4,7 +4,6 @@ import './Chart.css'
 
 const d3 = require("d3-fetch")
 const csvFile = require('../data.csv')
-const grey = "#505050"
 const green = "#99cc94"
 const red = "#e66668"
 const options = {
@@ -160,6 +159,12 @@ export default class Chart extends Component {
   }
 
   render() {
+    // Set the "space available" color depending on overload status
+    let classColor = "grey"
+    if (this.state.overloaded) {
+      classColor = "red"
+    }
+
     return (
       <div className="chart-container">
         <div className="container-fluid">
@@ -187,7 +192,7 @@ export default class Chart extends Component {
                     <p className="info">Maximum: { this.state.max }%</p>
                   </div>
                   <div className="col-md-5">
-                    <p className="info">Space Available: <span id="active-space">{ this.state.activeSpace }%</span></p>
+                    <p className="info">Space Available: <span className={ classColor }>{ this.state.activeSpace }%</span></p>
                   </div>
                 </div>
                 <div className="row">

@@ -44,3 +44,11 @@ option {
   font-style: italic;
   float: left
 }
+
+.grey {
+  color: #505050
+}
+
+.red {
+  color: #e66668
+}
