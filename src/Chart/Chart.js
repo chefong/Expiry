@@ -45,7 +45,7 @@ export default class Chart extends Component {
     selectedTotalLoad: 0,
     selectedIndices: [],
     largestMax: undefined,
-    mergedValue: undefined
+    mergedCapacity: undefined
   }
 
   updateCouriers = data => {
@@ -72,6 +72,19 @@ export default class Chart extends Component {
     this.setState({ couriers, names, loads, colors, maxes, currents })
   }
 
+  addCourier = (name, load, color, max, current) => {
+
+  }
+
+  resetSelectedMerged = () => {
+    this.setState({
+      selectedTotalLoad: 0,
+      selectedIndices: [],
+      largestMax: undefined,
+      mergedCapacity: undefined
+    })
+  }
+
   componentDidMount = () => {
     d3.csv(csvFile).then(data => {
       this.updateCouriers(data)
@@ -85,7 +98,9 @@ export default class Chart extends Component {
       let capacityA = (a.Load / a.Max)
       let capacityB = (b.Load / b.Max)
 
-      if (capacityA < capacityB) return 1
+      if (capacityA < capacityB) {
+        return 1
+      }
 
       return -1
     })
@@ -100,7 +115,9 @@ export default class Chart extends Component {
       let capacityA = (a.Load / a.Max)
       let capacityB = (b.Load / b.Max)
 
-      if (capacityA > capacityB) return 1
+      if (capacityA > capacityB) {
+        return 1
+      }
 
       return -1
     })
@@ -115,7 +132,9 @@ export default class Chart extends Component {
       let nameA = a.Name
       let nameB = b.Name
 
-      if (nameA > nameB) return 1
+      if (nameA > nameB) {
+        return 1
+      }
 
       return -1
     })
@@ -130,7 +149,9 @@ export default class Chart extends Component {
       let nameA = a.Name
       let nameB = b.Name
 
-      if (nameA < nameB) return 1
+      if (nameA < nameB) {
+        return 1
+      }
 
       return -1
     })
@@ -183,12 +204,13 @@ export default class Chart extends Component {
     let maxValue = this.state.maxes[activeIndex]
     let selectedTotalLoad = this.state.selectedTotalLoad
     let selectedIndices = [...this.state.selectedIndices]
-    let largestMax = this.state.largestMax
+    let largestMax = 0
 
     if (elementColor == darkGreenA) { // If the green bar element is selected
       colors[activeIndex] = "#13a706"
       selectedIndices.push(activeIndex)
 
+      // Set the largest maximum of the selected couriers
       if (selectedIndices.length == 1)  {
         this.setState({ largestMax: maxValue })
       }
@@ -205,16 +227,13 @@ export default class Chart extends Component {
 
       selectedTotalLoad -= loadValue
     }
-    else if (elementColor == darkRedA) {
-      colors[activeIndex] = "#b6070a"
-    }
-    else {
-      colors[activeIndex] = red
+    else { // If the red bar is clicked, nothing should happen
+      return
     }
 
-    let mergedValue = ((selectedTotalLoad / largestMax) * 100).toFixed(1)
+    let mergedCapacity = ((selectedTotalLoad / largestMax) * 100).toFixed(1)
 
-    this.setState({ colors, selectedTotalLoad, selectedIndices, largestMax, mergedValue })
+    this.setState({ colors, selectedTotalLoad, selectedIndices, largestMax, mergedCapacity })
   }
 
   handleElementClick = e => {
@@ -236,22 +255,65 @@ export default class Chart extends Component {
     }
   }
 
+  removeSelectedCouriers = selectedIndices => {
+    let couriers = [...this.state.couriers]
+    let names = [...this.state.names]
+    let loads = [...this.state.loads]
+    let maxes = [...this.state.maxes]
+    let currents = [...this.state.currents]
+
+    for (let i = 0; i < selectedIndices.length; ++i) {
+      let index = selectedIndices[i]
+      couriers.splice(index, 1)
+      names.splice(index, 1)
+      loads.splice(index, 1)
+      maxes.splice(index, 1)
+      currents.splice(index, 1)
+    }
+
+    this.resetSelectedMerged()
+    this.setState({ couriers, names, loads, maxes, currents })
+  }
+
+  getSelectedNames = selectedIndices => {
+    let selectedNames = []
+    let names = this.state.names
+
+    for (let i = 0; i < selectedIndices.length; ++i) {
+      let index = selectedIndices[i]
+      selectedNames.push(names[index])
+    }
+
+    return selectedNames
+  }
+
   handleMergeClick = e => {
     e.preventDefault()
 
     let selectedTotalLoad = this.state.selectedTotalLoad
     let largestMax = this.state.largestMax
-    let mergedValue = this.state.mergedValue
+    let mergedCapacity= this.state.mergedCapacity
 
     console.log("selectedTotalLoad", selectedTotalLoad)
     console.log("largestMax", largestMax)
     
-    if (mergedValue > 90) alert("overload")
+    if (mergedCapacity > 90) {
+      alert("overload")
+    }
+    else {
+      let selectedIndices = this.state.selectedIndices
+      let selectedNames = this.getSelectedNames(selectedIndices)
+      
+      this.removeSelectedCouriers(selectedIndices)
+
+      console.log(selectedNames.join(", "))
+
+    }
   }
 
   render() {
     let mergeClassColor = "green"
-    if (this.state.mergedValue > 90) {
+    if (this.state.mergedCapacity > 90) {
       mergeClassColor = "red"
     }
 
@@ -309,7 +371,7 @@ export default class Chart extends Component {
                 <button className="btn btn-secondary" onClick={ this.handleMergeClick }>Merge</button>
               </div>
               <div className="col-md-3">
-                <p id="merge-info">Merged Capacity: <span className={ mergeClassColor }>{ this.state.mergedValue }%</span></p>
+                <p id="merge-info">Merged Capacity: <span className={ mergeClassColor }>{ this.state.mergedCapacity }%</span></p>
               </div>
             </div> }
           </div>
