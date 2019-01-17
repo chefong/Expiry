@@ -1,17 +1,18 @@
 import React, { Component } from 'react'
+import { withRouter, Redirect } from 'react-router-dom'
+import Title from '../Title/Title';
 import Info from '../Info/Info'
 import Chart from '../Chart/Chart'
 import Filter from '../Filter/Filter'
 import './Home.css'
 
-const d3 = require('d3-fetch')
-const csvFile = require('../data.csv')
+const Papa = require('papaparse')
 const green = "#99cc94"
 const red = "#e66668"
 const darkGreenA = "rgb(115, 209, 107)"
 const darkGreenB = "rgb(13, 158, 0)"
 
-export default class Home extends Component {
+class Home extends Component {
   state = {
     couriers: undefined,
     names: undefined,
@@ -30,6 +31,28 @@ export default class Home extends Component {
     largestMax: undefined,
     mergedCapacity: undefined,
     overLoadAlert: false
+  }
+
+  componentDidMount = () => {
+    if (this.props.file) {
+      Papa.parse(this.props.file, {
+        complete: results => {
+          let data = []
+
+          for (let i = 0; i < results.data.length; ++i) {
+            let courier = { 
+              Name: results.data[i][0],
+              Load: results.data[i][1],
+              Max: results.data[i][2]
+            }
+
+            data.push(courier)
+          }
+
+          this.updateCouriers(data)
+        }
+      })
+    }
   }
 
   updateCouriers = data => {
@@ -61,12 +84,6 @@ export default class Home extends Component {
       selectedIndices: [],
       largestMax: undefined,
       mergedCapacity: undefined
-    })
-  }
-
-  componentDidMount = () => {
-    d3.csv(csvFile).then(data => {
-      this.updateCouriers(data)
     })
   }
 
@@ -298,14 +315,21 @@ export default class Home extends Component {
   }
 
   render() {
+    // Set color depending on merged value
     let mergeClassColor = "green"
     if (this.state.mergedCapacity > 90) {
       mergeClassColor = "red"
     }
 
+    // Redirect to root page if no file is received
+    if (!this.props.file) {
+      return <Redirect to="/"/>
+    }
+
     return (
       <div className="home-container">
         <div className="container-fluid">
+          <Title/>
           <div className="row justify-content-center">
             <div className="col-md-7">
               <div className="row justify-content-center">
@@ -351,3 +375,5 @@ export default class Home extends Component {
     )
   }
 }
+
+export default withRouter(Home)

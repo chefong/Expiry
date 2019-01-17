@@ -1,14 +1,33 @@
 import React, { Component } from 'react';
-import Title from './Title/Title';
+import { BrowserRouter, Route, Switch } from 'react-router-dom';
 import Home from './Home/Home';
+import Input from './Input/Input'
 import './App.css';
 
 class App extends Component {
+  state = {
+    file: undefined
+  }
+
+  handleFileUpload = file => {
+    this.setState({ file })
+  }
+  
   render() {
     return (
       <div className="App">
-        <Title/>
-        <Home/>
+        <BrowserRouter>
+        	<Switch>
+            <Route 
+              exact path="/" 
+              render={ props => <Input {...props} 
+              handleFileUpload={ file => this.handleFileUpload(file) }/> }
+            />
+            <Route 
+              path="/home" 
+              render={ props => <Home {...props} file={ this.state.file }/> }/>
+          </Switch>
+        </BrowserRouter>
       </div>
     );
   }
