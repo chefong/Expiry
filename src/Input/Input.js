@@ -5,25 +5,49 @@ import Dropzone from 'react-dropzone'
 import './Input.css'
 
 const uploadIcon = require('../assets/images/upload.png')
+const spinner = require('../assets/images/spinner.svg')
 
 export default class Input extends Component {
   state = {
     file: undefined,
     fileReceived: false,
-    fileName: undefined
+    fileName: undefined,
+    isSingleFile: true,
+    isCorrectFile: true,
+    isUploading: false
   }
 
   onDrop = acceptedFiles => {
+    let file = acceptedFiles[0]
+
+    this.setState({ isUploading: true })
+
     if (acceptedFiles.length > 1) {
-      alert("Too many files received")
-    }
-    else {
-      console.log(acceptedFiles[0].name)
-      this.setState({ 
-        file: acceptedFiles[0],
-        fileName: acceptedFiles[0].name
+      this.setState({
+        file: undefined,
+        fileReceived: false,
+        isSingleFile: false,
+        isCorrectFile: true
       })
     }
+    else if (file.type != "text/csv") {
+      this.setState({
+        file: undefined,
+        fileReceived: false,
+        isSingleFile: true,
+        isCorrectFile: false
+      })
+    }
+    else {
+      this.setState({ 
+        file,
+        fileName: file.name,
+        isSingleFile: true,
+        isCorrectFile: true
+      })
+    }
+
+    this.setState({ isUploading: false })
   }
 
   handleUploadSubmit = e => {
@@ -52,18 +76,16 @@ export default class Input extends Component {
           <div class="row justify-content-center">
             <div class="col-md-1">
               <Dropzone onDrop={ this.onDrop }>
-                {({getRootProps, getInputProps, isDragActive}) => {
+                {({getRootProps, getInputProps}) => {
                   return (
                     <div
                       {...getRootProps()}
                     >
                       <input {...getInputProps()} />
                       {
-                        isDragActive ?
-                          <p>Drop files here...</p> :
-                          <div className="upload-container">
-                            <img id="upload-icon" src={ uploadIcon } alt=""/>
-                          </div>
+                        <div className="upload-container">
+                          <img id="upload-icon" src={ uploadIcon } alt=""/>
+                        </div>
                       }
                     </div>
                   )
@@ -76,6 +98,19 @@ export default class Input extends Component {
               <div className="file-name-container">
                 { this.state.fileName && <p id="file-name">{ this.state.fileName }</p> }
               </div>
+            </div>
+          </div>
+          <div className="row justify-content-center">
+            <div class="upload-alert-container">
+              { !this.state.isSingleFile && <div class="alert alert-danger" role="alert">
+                  Please upload only 1 file!
+              </div> }
+              { !this.state.isCorrectFile && <div class="alert alert-danger" role="alert">
+                  Please upload a CSV file!
+              </div> }
+              { this.state.isUploading && <div class="spinner-container">
+                <img id="spinner" src={ spinner }/>
+              </div> }
             </div>
           </div>
           <div className="row justify-content-center">
