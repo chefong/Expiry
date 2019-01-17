@@ -23,3 +23,7 @@ code {
   font-family: "League Gothic";
   font-style: italic;
 }
+
+*:focus {
+  outline: none
+}

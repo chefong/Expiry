@@ -1,7 +1,38 @@
 .upload-container {
   text-align: center;
+  margin-top: 10%;
+  margin-bottom: 20px;
+}
+
+#upload-caption {
+  font-family: "League Gothic";
+  color: #505050;
+  font-style: italic;
+  text-align: center;
+  font-size: 200%;
+  margin-top: 5%
 }
 
 #upload-icon {
-  width: 100%
+  width: 100%;
+}
+
+#upload-icon:hover {
+  cursor: pointer
+}
+
+.file-name-container {
+  height: 120px
+}
+
+#file-name {
+  font-family: "League Gothic";
+  color: #505050;
+  font-style: italic;
+  text-align: center;
+  font-size: 150%
+}
+
+.upload-button-container {
+  text-align: center
 }

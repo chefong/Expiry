@@ -7,6 +7,9 @@ option {
 }
 
 .btn-secondary {
-  border-radius: 0px;
+  border-radius: 0px
+}
+
+#filter-button {
   margin-left: 20px
 }
