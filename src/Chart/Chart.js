@@ -72,10 +72,6 @@ export default class Chart extends Component {
     this.setState({ couriers, names, loads, colors, maxes, currents })
   }
 
-  addCourier = (name, load, color, max, current) => {
-
-  }
-
   resetSelectedMerged = () => {
     this.setState({
       selectedTotalLoad: 0,
@@ -247,35 +243,11 @@ export default class Chart extends Component {
       let activeSpace = (max - activeCurrent).toFixed(1)
       
       activeSpace < 0.0 ? this.setState({ overloaded: true }) : this.setState({ overloaded: false })
-
       this.setState({ activeIndex, activeCurrent, activeSpace })
 
       let elementColor = chartElement._model.backgroundColor
       this.setElementColor(activeIndex, elementColor)
     }
-  }
-
-  removeSelectedCouriers = selectedIndices => {
-    let couriers = [...this.state.couriers]
-    let names = [...this.state.names]
-    let loads = [...this.state.loads]
-    let maxes = [...this.state.maxes]
-    let currents = [...this.state.currents]
-    let colors = [...this.state.colors]
-
-    for (let i = 0; i < selectedIndices.length; ++i) {
-      let index = selectedIndices[i]
-
-      couriers.splice(index, 1)
-      names.splice(index, 1)
-      loads.splice(index, 1)
-      maxes.splice(index, 1)
-      currents.splice(index, 1)
-      colors.splice(index, 1)
-    }
-
-    this.resetSelectedMerged()
-    this.setState({ couriers, names, loads, maxes, currents, colors })
   }
 
   getSelectedNames = selectedIndices => {
@@ -290,26 +262,54 @@ export default class Chart extends Component {
     return selectedNames
   }
 
+  editSelectedCouriers = (selectedIndices, load, color, max, current) => {
+    let couriers = [...this.state.couriers]
+    let names = [...this.state.names]
+    let loads = [...this.state.loads]
+    let maxes = [...this.state.maxes]
+    let currents = [...this.state.currents]
+    let colors = [...this.state.colors]
+
+    // Remove the selected couriers
+    for (let i = 0; i < selectedIndices.length; ++i) {
+      let index = selectedIndices[i]
+
+      couriers.splice(index, 1)
+      names.splice(index, 1)
+      loads.splice(index, 1)
+      maxes.splice(index, 1)
+      currents.splice(index, 1)
+      colors.splice(index, 1)
+    }
+
+    let mergedName = this.getSelectedNames(selectedIndices).join(", ")
+    let mergedCourier = { Name: mergedName, Load: load, Max: max }
+
+    // Add the selected couriers
+    couriers.push(mergedCourier)
+    names.push(mergedName)
+    loads.push(load)
+    colors.push(color)
+    maxes.push(max)
+    currents.push(current)
+
+    this.resetSelectedMerged()
+    this.setState({ couriers, names, loads, maxes, currents, colors })
+  }
+
   handleMergeClick = e => {
     e.preventDefault()
 
     let selectedTotalLoad = this.state.selectedTotalLoad
     let largestMax = this.state.largestMax
     let mergedCapacity= this.state.mergedCapacity
-
-    console.log("selectedTotalLoad", selectedTotalLoad)
-    console.log("largestMax", largestMax)
     
     if (mergedCapacity > 90) {
       alert("overload")
     }
     else {
       let selectedIndices = this.state.selectedIndices.sort().reverse()
-      let selectedNames = this.getSelectedNames(selectedIndices)
-      
-      this.removeSelectedCouriers(selectedIndices)
-
-      let mergedNames = selectedNames.join(", ")
+      this.editSelectedCouriers(selectedIndices, selectedTotalLoad, green, largestMax, mergedCapacity)
     }
   }
 
