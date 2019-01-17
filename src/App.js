@@ -1,15 +1,14 @@
 import React, { Component } from 'react';
-import './App.css';
-
 import Title from './Title/Title';
-import Chart from './Chart/Chart';
+import Home from './Home/Home';
+import './App.css';
 
 class App extends Component {
   render() {
     return (
       <div className="App">
         <Title/>
-        <Chart/>
+        <Home/>
       </div>
     );
   }

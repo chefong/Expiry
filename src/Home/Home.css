@@ -1,0 +1,38 @@
+#chart-name {
+  font-family: "League Gothic";
+  color: #505050;
+  font-style: italic;
+  text-align: center;
+  font-size: 300%;
+}
+
+#sortBy, .btn {
+  font-family: "League Gothic";
+  letter-spacing: 1px;
+}
+
+.form-inline {
+  margin-bottom: 2%;
+}
+
+#merge-info {
+  font-family: "League Gothic";
+  font-size: 150%;
+  color: #505050;
+  font-style: italic
+}
+
+.merge-container {
+  margin-top: 2%;
+  margin-bottom: 1%
+}
+
+.alert {
+  font-family: "League Gothic";
+  font-size: 150%;
+}
+
+.alert-container {
+  height: 100px;
+  text-align: center;
+}
