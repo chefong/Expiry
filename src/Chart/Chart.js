@@ -261,18 +261,21 @@ export default class Chart extends Component {
     let loads = [...this.state.loads]
     let maxes = [...this.state.maxes]
     let currents = [...this.state.currents]
+    let colors = [...this.state.colors]
 
     for (let i = 0; i < selectedIndices.length; ++i) {
       let index = selectedIndices[i]
+
       couriers.splice(index, 1)
       names.splice(index, 1)
       loads.splice(index, 1)
       maxes.splice(index, 1)
       currents.splice(index, 1)
+      colors.splice(index, 1)
     }
 
     this.resetSelectedMerged()
-    this.setState({ couriers, names, loads, maxes, currents })
+    this.setState({ couriers, names, loads, maxes, currents, colors })
   }
 
   getSelectedNames = selectedIndices => {
@@ -301,13 +304,12 @@ export default class Chart extends Component {
       alert("overload")
     }
     else {
-      let selectedIndices = this.state.selectedIndices
+      let selectedIndices = this.state.selectedIndices.sort().reverse()
       let selectedNames = this.getSelectedNames(selectedIndices)
       
       this.removeSelectedCouriers(selectedIndices)
 
-      console.log(selectedNames.join(", "))
-
+      let mergedNames = selectedNames.join(", ")
     }
   }
 
@@ -367,7 +369,7 @@ export default class Chart extends Component {
           </div>
           <div className="merge-container">
             { this.state.selectedIndices.length > 1 && <div className="row justify-content-center">
-              <div class="col-md-3">
+              <div className="col-md-3">
                 <button className="btn btn-secondary" onClick={ this.handleMergeClick }>Merge</button>
               </div>
               <div className="col-md-3">
