@@ -1,0 +1,12 @@
+select {
+  max-width: 125%
+}
+
+option {
+  font-family: "League Gothic"
+}
+
+.btn-secondary {
+  border-radius: 0px;
+  margin-left: 20px
+}

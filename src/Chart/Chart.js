@@ -1,12 +1,9 @@
 import React, { Component } from 'react'
-import { HorizontalBar } from 'react-chartjs-2'
 import { defaults } from 'react-chartjs-2'
 import Info from '../Info/Info'
+import Bar from '../Bar/Bar'
+import Filter from '../Filter/Filter'
 import './Chart.css'
-
-// Edited Chart JS's default font settings
-defaults.global.defaultFontFamily = 'League Gothic'
-defaults.global.defaultFontSize = 16
 
 const d3 = require("d3-fetch")
 const csvFile = require('../data.csv')
@@ -14,18 +11,6 @@ const green = "#99cc94"
 const red = "#e66668"
 const darkGreenA = "rgb(115, 209, 107)"
 const darkGreenB = "rgb(13, 158, 0)"
-const options = {
-  legend: {
-    display: false
-  },
-  scales: {
-    xAxes: [{
-      ticks: {
-        beginAtZero: true
-      }
-    }]
-  }
-}
 
 export default class Chart extends Component {
   state = {
@@ -269,7 +254,7 @@ export default class Chart extends Component {
     let currents = [...this.state.currents]
     let colors = [...this.state.colors]
 
-    // Remove the selected couriers
+    // Remove the selected couriers from the states
     for (let i = 0; i < selectedIndices.length; ++i) {
       let index = selectedIndices[i]
 
@@ -284,7 +269,7 @@ export default class Chart extends Component {
     let mergedName = this.getSelectedNames(selectedIndices).join(", ")
     let mergedCourier = { Name: mergedName, Load: load, Max: max }
 
-    // Add the selected couriers
+    // Add the selected couriers to the states
     couriers.push(mergedCourier)
     names.push(mergedName)
     loads.push(load)
@@ -327,17 +312,7 @@ export default class Chart extends Component {
               <div className="row justify-content-center">
                 <h1 id="chart-name">Loading Capacities</h1>
               </div>
-              <div className="row justify-content-center">
-                <form className="form-inline" onSubmit={ this.handleSubmit }>
-                  <select className="form-control" name="sortBy" id="sortBy">
-                    <option>Low - High</option>
-                    <option>High - Low</option>
-                    <option>A - Z</option>
-                    <option>Z - A</option>
-                  </select>
-                  <button type="submit" className="btn btn-secondary">Submit</button>
-                </form>
-              </div>
+              <Filter handleSubmit={ this.handleSubmit }/>
             </div>
             <div className="col-md-5">
               <Info 
@@ -348,25 +323,13 @@ export default class Chart extends Component {
               />
             </div>
           </div>
-          <div className="bar-container">
-            <div className="row justify-content-center">
-              <div className="col-md-10">
-                { this.state.names && this.state.loads && this.state.currents && this.state.colors && <HorizontalBar
-                  data={
-                    {
-                      labels: this.state.names,
-                      datasets: [{
-                        backgroundColor: this.state.colors,
-                        data: this.state.currents
-                      }]
-                    }
-                  }
-                  options={ options }
-                  getElementAtEvent={ this.handleElementClick }
-                /> }
-              </div>
-            </div>
-          </div>
+          <Bar 
+            names={ this.state.names }
+            loads={ this.state.loads }
+            currents={ this.state.currents }
+            colors={ this.state.colors }
+            handleElementClick={ this.handleElementClick }
+          />
           <div className="merge-container">
             { this.state.selectedIndices.length > 1 && <div className="row justify-content-center">
               <div className="col-md-3">
