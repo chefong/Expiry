@@ -35,3 +35,10 @@ option {
 .merge-container {
   height: 100px;
 }
+
+#merge-info {
+  font-family: "League Gothic";
+  font-size: 150%;
+  color: #505050;
+  font-style: italic
+}

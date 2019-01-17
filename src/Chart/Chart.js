@@ -44,7 +44,8 @@ export default class Chart extends Component {
     activeOverload: undefined,
     selectedTotalLoad: 0,
     selectedIndices: [],
-    largestMax: undefined
+    largestMax: undefined,
+    mergedValue: undefined
   }
 
   updateCouriers = data => {
@@ -81,10 +82,10 @@ export default class Chart extends Component {
     let data = this.state.couriers
 
     data.sort((a, b) => {
-      let loadA = a.Load
-      let loadB = b.Load
+      let capacityA = (a.Load / a.Max)
+      let capacityB = (b.Load / b.Max)
 
-      if (loadA < loadB) return 1
+      if (capacityA < capacityB) return 1
 
       return -1
     })
@@ -96,10 +97,10 @@ export default class Chart extends Component {
     let data = this.state.couriers
 
     data.sort((a, b) => {
-      let loadA = a.Load
-      let loadB = b.Load
+      let capacityA = (a.Load / a.Max)
+      let capacityB = (b.Load / b.Max)
 
-      if (loadA > loadB) return 1
+      if (capacityA > capacityB) return 1
 
       return -1
     })
@@ -154,6 +155,12 @@ export default class Chart extends Component {
       default:
         this.onZASelect()
     }
+
+    // Clear values whenever a filter is submitted
+    this.setState({
+      selectedTotalLoad: 0,
+      largestMax: undefined
+    })
   }
 
   setLargestMax = selectedIndices => {
@@ -166,8 +173,8 @@ export default class Chart extends Component {
         largestMax = maxes[index]
       }
     }
-    console.log(largestMax)
-    this.setState({ largestMax })
+
+    return largestMax
   }
 
   setElementColor = (activeIndex, elementColor) => {
@@ -176,17 +183,17 @@ export default class Chart extends Component {
     let maxValue = this.state.maxes[activeIndex]
     let selectedTotalLoad = this.state.selectedTotalLoad
     let selectedIndices = [...this.state.selectedIndices]
+    let largestMax = this.state.largestMax
 
     if (elementColor == darkGreenA) { // If the green bar element is selected
       colors[activeIndex] = "#13a706"
       selectedIndices.push(activeIndex)
 
       if (selectedIndices.length == 1)  {
-        console.log(maxValue)
         this.setState({ largestMax: maxValue })
       }
       else {
-        this.setLargestMax(selectedIndices)
+        largestMax = this.setLargestMax(selectedIndices)
       }
 
       selectedTotalLoad += loadValue
@@ -194,7 +201,7 @@ export default class Chart extends Component {
     else if (elementColor == darkGreenB) { // If the green bar element is deselected
       colors[activeIndex] = green
       selectedIndices.splice(selectedIndices.indexOf(activeIndex))
-      this.setLargestMax(selectedIndices)
+      largestMax = this.setLargestMax(selectedIndices)
 
       selectedTotalLoad -= loadValue
     }
@@ -205,11 +212,9 @@ export default class Chart extends Component {
       colors[activeIndex] = red
     }
 
-    console.log(selectedIndices)
+    let mergedValue = ((selectedTotalLoad / largestMax) * 100).toFixed(1)
 
-    console.log("selectedTotalLoad", selectedTotalLoad)
-
-    this.setState({ colors, selectedTotalLoad, selectedIndices })
+    this.setState({ colors, selectedTotalLoad, selectedIndices, largestMax, mergedValue })
   }
 
   handleElementClick = e => {
@@ -236,12 +241,20 @@ export default class Chart extends Component {
 
     let selectedTotalLoad = this.state.selectedTotalLoad
     let largestMax = this.state.largestMax
-    let newLoadValue = ((selectedTotalLoad / largestMax) * 100).toFixed(1)
+    let mergedValue = this.state.mergedValue
+
+    console.log("selectedTotalLoad", selectedTotalLoad)
+    console.log("largestMax", largestMax)
     
-    if (newLoadValue > 90) alert("overload")
+    if (mergedValue > 90) alert("overload")
   }
 
   render() {
+    let mergeClassColor = "green"
+    if (this.state.mergedValue > 90) {
+      mergeClassColor = "red"
+    }
+
     return (
       <div className="chart-container">
         <div className="container-fluid">
@@ -291,9 +304,14 @@ export default class Chart extends Component {
             </div>
           </div>
           <div className="merge-container">
-            <div className="row justify-content-center">
-              { this.state.selectedIndices.length > 1 && <button className="btn btn-secondary" onClick={ this.handleMergeClick }>Merge</button> }
-            </div>
+            { this.state.selectedIndices.length > 1 && <div className="row justify-content-center">
+              <div class="col-md-3">
+                <button className="btn btn-secondary" onClick={ this.handleMergeClick }>Merge</button>
+              </div>
+              <div className="col-md-3">
+                <p id="merge-info">Merged Capacity: <span className={ mergeClassColor }>{ this.state.mergedValue }%</span></p>
+              </div>
+            </div> }
           </div>
         </div>
       </div>
