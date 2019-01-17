@@ -11,10 +11,9 @@ defaults.global.defaultFontSize = 16
 const d3 = require("d3-fetch")
 const csvFile = require('../data.csv')
 const green = "#99cc94"
+const red = "#e66668"
 const darkGreenA = "rgb(115, 209, 107)"
 const darkGreenB = "rgb(13, 158, 0)"
-const darkRedA = "rgb(255, 46, 49)"
-const red = "#e66668"
 const options = {
   legend: {
     display: false
@@ -45,7 +44,8 @@ export default class Chart extends Component {
     selectedTotalLoad: 0,
     selectedIndices: [],
     largestMax: undefined,
-    mergedCapacity: undefined
+    mergedCapacity: undefined,
+    overLoadAlert: false
   }
 
   updateCouriers = data => {
@@ -63,7 +63,6 @@ export default class Chart extends Component {
       maxes.push(parseInt(data[i].Max))
 
       let current = ((data[i].Load / data[i].Max) * 100).toFixed(1)
-
       currents.push(current)
 
       current <= this.state.max ? colors.push(green) : colors.push(red)
@@ -305,9 +304,10 @@ export default class Chart extends Component {
     let mergedCapacity= this.state.mergedCapacity
     
     if (mergedCapacity > 90) {
-      alert("overload")
+      this.setState({ overLoadAlert: true })
     }
     else {
+      this.setState({ overLoadAlert: false })
       let selectedIndices = this.state.selectedIndices.sort().reverse()
       this.editSelectedCouriers(selectedIndices, selectedTotalLoad, green, largestMax, mergedCapacity)
     }
@@ -376,6 +376,13 @@ export default class Chart extends Component {
                 <p id="merge-info">Merged Capacity: <span className={ mergeClassColor }>{ this.state.mergedCapacity }%</span></p>
               </div>
             </div> }
+          </div>
+          <div className="alert-container">
+            <div class="row justify-content-center">
+              { this.state.overLoadAlert && <div className="alert alert-danger" role="alert">
+                Error: Attempting to overload couriers
+              </div> }
+            </div>
           </div>
         </div>
       </div>

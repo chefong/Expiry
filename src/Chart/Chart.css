@@ -32,13 +32,23 @@ option {
   margin-bottom: 2%;
 }
 
-.merge-container {
-  height: 100px;
-}
-
 #merge-info {
   font-family: "League Gothic";
   font-size: 150%;
   color: #505050;
   font-style: italic
+}
+
+.merge-container {
+  margin-bottom: 1%
+}
+
+.alert {
+  font-family: "League Gothic";
+  font-size: 150%;
+}
+
+.alert-container {
+  height: 100px;
+  text-align: center;
 }
