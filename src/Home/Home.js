@@ -116,28 +116,9 @@ export default class Home extends Component {
     })
   }
 
-  onHLSelect = () => {
-    let data = this.state.couriers
+  sortCapacities = couriers => {
+    let data = couriers
 
-    // Sort couriers' capacities in descending order
-    data.sort((a, b) => {
-      let capacityA = (a.Load / a.Max)
-      let capacityB = (b.Load / b.Max)
-
-      if (capacityA < capacityB) {
-        return 1
-      }
-
-      return -1
-    })
-    
-    this.updateCouriers(data)
-  }
-
-  onLHSelect = () => {
-    let data = this.state.couriers
-
-    // Sort couriers' capacities in ascending order
     data.sort((a, b) => {
       let capacityA = (a.Load / a.Max)
       let capacityB = (b.Load / b.Max)
@@ -148,14 +129,13 @@ export default class Home extends Component {
 
       return -1
     })
-    
-    this.updateCouriers(data)
+
+    return data
   }
 
-  onAZSelect = () => {
-    let data = this.state.couriers
+  sortNames = couriers => {
+    let data = couriers
 
-    // Sort couriers' names in alphabetical order, from A to Z
     data.sort((a, b) => {
       let nameA = a.Name
       let nameB = b.Name
@@ -166,26 +146,33 @@ export default class Home extends Component {
 
       return -1
     })
-    
-    this.updateCouriers(data)
+
+    return data
+  }
+
+  onLHSelect = () => {
+    let couriers = this.state.couriers
+    couriers = this.sortCapacities(couriers)
+    this.updateCouriers(couriers)
+  }
+
+
+  onHLSelect = () => {
+    let couriers = this.state.couriers
+    couriers = this.sortCapacities(couriers).reverse()
+    this.updateCouriers(couriers)
+  }
+
+  onAZSelect = () => {
+    let couriers = this.state.couriers
+    couriers = this.sortNames(couriers)
+    this.updateCouriers(couriers)
   }
 
   onZASelect = () => {
-    let data = this.state.couriers
-
-    // Sort couriers' names in alphabetical order, from Z to A
-    data.sort((a, b) => {
-      let nameA = a.Name
-      let nameB = b.Name
-
-      if (nameA < nameB) {
-        return 1
-      }
-
-      return -1
-    })
-    
-    this.updateCouriers(data)
+    let couriers = this.state.couriers
+    couriers = this.sortNames(couriers).reverse()
+    this.updateCouriers(couriers)
   }
 
   handleSubmit = e => {
