@@ -20,8 +20,7 @@ class App extends Component {
         	<Switch>
             <Route 
               exact path="/" 
-              render={ props => <Input {...props} 
-              handleFileUpload={ file => this.handleFileUpload(file) }/> }
+              render={ props => <Input {...props} handleFileUpload={ file => this.handleFileUpload(file) }/> }
             />
             <Route 
               path="/home" 

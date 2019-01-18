@@ -5,7 +5,6 @@ import Dropzone from 'react-dropzone'
 import './Input.css'
 
 const uploadIcon = require('../assets/images/upload.png')
-const spinner = require('../assets/images/spinner.svg')
 
 export default class Input extends Component {
   state = {
@@ -13,16 +12,13 @@ export default class Input extends Component {
     fileReceived: false,
     fileName: undefined,
     isSingleFile: true,
-    isCorrectFile: true,
-    isUploading: false
+    isCorrectFile: true
   }
 
   onDrop = acceptedFiles => {
     let file = acceptedFiles[0]
 
-    this.setState({ isUploading: true })
-
-    if (acceptedFiles.length > 1) {
+    if (acceptedFiles.length > 1) { // Check if there is more than 1 file selected
       this.setState({
         file: undefined,
         fileReceived: false,
@@ -30,7 +26,7 @@ export default class Input extends Component {
         isCorrectFile: true
       })
     }
-    else if (file.type != "text/csv") {
+    else if (file.type != "text/csv") { // Check if the file type is incorrect
       this.setState({
         file: undefined,
         fileReceived: false,
@@ -46,13 +42,12 @@ export default class Input extends Component {
         isCorrectFile: true
       })
     }
-
-    this.setState({ isUploading: false })
   }
 
   handleUploadSubmit = e => {
     e.preventDefault()
 
+    // Send file to props
     if (this.state.file) {
       let file = this.state.file
       this.props.handleFileUpload(file)
@@ -107,9 +102,6 @@ export default class Input extends Component {
               </div> }
               { !this.state.isCorrectFile && <div class="alert alert-danger" role="alert">
                   Please upload a CSV file!
-              </div> }
-              { this.state.isUploading && <div class="spinner-container">
-                <img id="spinner" src={ spinner }/>
               </div> }
             </div>
           </div>
