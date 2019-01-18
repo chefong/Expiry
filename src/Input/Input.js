@@ -79,7 +79,7 @@ export default class Input extends Component {
                       <input {...getInputProps()} />
                       {
                         <div className="upload-container">
-                          <img id="upload-icon" src={ uploadIcon } alt=""/>
+                          <img id="upload-icon" src={ uploadIcon } alt="Upload Icon"/>
                         </div>
                       }
                     </div>
