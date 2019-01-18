@@ -28,6 +28,8 @@ HOW THE APPLICATION WORKS:
 
 7) Clicking the "Merge" button combines all the couriers selected. Determining whether or not a merge is allowed is done by first getting the largest maximum size of all the selected courier vehicles. Once this is found, each courier's load is added together to produce the new merged load. Then, the capacity of the newly merged vehicle is calculated like before, "(Load / Max) * 100)".
 
+8) For further reference, you may view the GIFs that are included that demonstrate some of the application's functionalities. The GIFs are located in the "gifs" folder in the root folder of the application.
+
 
 
 CHALLENGES FACED

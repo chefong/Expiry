@@ -40,10 +40,7 @@ export default class Home extends Component {
     let currents = JSON.parse(localStorage.getItem("currents"))
     let colors = JSON.parse(localStorage.getItem("colors"))
 
-    if (couriers && names && loads && maxes && currents && colors) { // If items are in localStorage
-      this.setState({ couriers, names, loads, maxes, currents, colors })
-    }
-    else if (this.props.file) { // If localStorage is empty and a file is received
+    if (this.props.file) { // If localStorage is empty and a file is received
       Papa.parse(this.props.file, {
         complete: results => {
           let data = []
@@ -64,6 +61,9 @@ export default class Home extends Component {
           this.updateCouriers(data)
         }
       })
+    }
+    else if (couriers && names && loads && maxes && currents && colors) { // If items are in localStorage
+      this.setState({ couriers, names, loads, maxes, currents, colors })
     }
     else { // If localStorage is empty or no file is received, navigate back to root
       window.location.href = "/"
