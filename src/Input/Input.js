@@ -30,14 +30,6 @@ export default class Input extends Component {
         isCorrectFile: true
       })
     }
-    else if (file.type != "text/csv") {
-      this.setState({
-        file: undefined,
-        fileReceived: false,
-        isSingleFile: true,
-        isCorrectFile: false
-      })
-    }
     else {
       this.setState({ 
         file,

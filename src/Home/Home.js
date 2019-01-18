@@ -1,5 +1,4 @@
 import React, { Component } from 'react'
-import { withRouter, Redirect } from 'react-router-dom'
 import Title from '../Title/Title';
 import Info from '../Info/Info'
 import Chart from '../Chart/Chart'
@@ -12,7 +11,7 @@ const red = "#e66668"
 const darkGreenA = "rgb(115, 209, 107)"
 const darkGreenB = "rgb(13, 158, 0)"
 
-class Home extends Component {
+export default class Home extends Component {
   state = {
     couriers: undefined,
     names: undefined,
@@ -34,25 +33,51 @@ class Home extends Component {
   }
 
   componentDidMount = () => {
-    if (this.props.file) {
+    let couriers = JSON.parse(localStorage.getItem("couriers"))
+    let names = JSON.parse(localStorage.getItem("names"))
+    let loads = JSON.parse(localStorage.getItem("loads"))
+    let maxes = JSON.parse(localStorage.getItem("maxes"))
+    let currents = JSON.parse(localStorage.getItem("currents"))
+    let colors = JSON.parse(localStorage.getItem("colors"))
+
+    if (couriers && names && loads && maxes && currents && colors) { // If items are in localStorage
+      this.setState({ couriers, names, loads, maxes, currents, colors })
+    }
+    else if (this.props.file) { // If localStorage is empty and a file is received
       Papa.parse(this.props.file, {
         complete: results => {
           let data = []
 
           for (let i = 0; i < results.data.length; ++i) {
+            // Create a new courier object
             let courier = { 
               Name: results.data[i][0],
               Load: results.data[i][1],
               Max: results.data[i][2]
             }
-
+            
+            // Add new courier to the array
             data.push(courier)
           }
-
+          
+          // Update the rest of the courier information
           this.updateCouriers(data)
         }
       })
     }
+    else { // If localStorage is empty or no file is received, navigate back to root
+      window.location.href = "/"
+    }
+  }
+
+  // Store important states in localStorage
+  componentDidUpdate = () => {
+    localStorage.setItem("couriers", JSON.stringify(this.state.couriers))
+    localStorage.setItem("names", JSON.stringify(this.state.names))
+    localStorage.setItem("loads", JSON.stringify(this.state.loads))
+    localStorage.setItem("maxes", JSON.stringify(this.state.maxes))
+    localStorage.setItem("currents", JSON.stringify(this.state.currents))
+    localStorage.setItem("colors", JSON.stringify(this.state.colors))
   }
 
   updateCouriers = data => {
@@ -69,16 +94,20 @@ class Home extends Component {
       loads.push(parseInt(data[i].Load))
       maxes.push(parseInt(data[i].Max))
 
+      // Use load and max to calculate the courier's current capacity
       let current = ((data[i].Load / data[i].Max) * 100).toFixed(1)
       currents.push(current)
 
+      // Choose color for the bar graph, depending on its current capacity
       current <= this.state.max ? colors.push(green) : colors.push(red)
     }
 
+    // Update state after updating and storing courier information
     this.setState({ couriers, names, loads, colors, maxes, currents })
   }
 
   resetSelectedMerged = () => {
+    // Reset states used in merging
     this.setState({
       selectedTotalLoad: 0,
       selectedIndices: [],
@@ -90,6 +119,7 @@ class Home extends Component {
   onHLSelect = () => {
     let data = this.state.couriers
 
+    // Sort couriers' capacities in descending order
     data.sort((a, b) => {
       let capacityA = (a.Load / a.Max)
       let capacityB = (b.Load / b.Max)
@@ -107,6 +137,7 @@ class Home extends Component {
   onLHSelect = () => {
     let data = this.state.couriers
 
+    // Sort couriers' capacities in ascending order
     data.sort((a, b) => {
       let capacityA = (a.Load / a.Max)
       let capacityB = (b.Load / b.Max)
@@ -124,6 +155,7 @@ class Home extends Component {
   onAZSelect = () => {
     let data = this.state.couriers
 
+    // Sort couriers' names in alphabetical order, from A to Z
     data.sort((a, b) => {
       let nameA = a.Name
       let nameB = b.Name
@@ -141,6 +173,7 @@ class Home extends Component {
   onZASelect = () => {
     let data = this.state.couriers
 
+    // Sort couriers' names in alphabetical order, from Z to A
     data.sort((a, b) => {
       let nameA = a.Name
       let nameB = b.Name
@@ -159,6 +192,8 @@ class Home extends Component {
     e.preventDefault()
 
     let sortOption = e.target.sortBy.value
+
+    // Choose which filter was submitted
     switch(sortOption) {
       case "Low - High":
         this.onLHSelect()
@@ -184,8 +219,10 @@ class Home extends Component {
     let maxes = this.state.maxes
     let largestMax = maxes[selectedIndices[0]]
 
+    // Find the largest maximum between all the selected couriers
     for (let i = 0; i < selectedIndices.length; ++i) {
       let index = selectedIndices[i]
+
       if (maxes[index] > largestMax) {
         largestMax = maxes[index]
       }
@@ -227,6 +264,7 @@ class Home extends Component {
       return
     }
 
+    // Calculate and set the new capacity of the merged couriers
     let mergedCapacity = ((selectedTotalLoad / largestMax) * 100).toFixed(1)
 
     this.setState({ colors, selectedTotalLoad, selectedIndices, largestMax, mergedCapacity })
@@ -241,10 +279,12 @@ class Home extends Component {
       let activeIndex = chartElement._index
       let activeCurrent = currents[activeIndex]
       let activeSpace = (max - activeCurrent).toFixed(1)
-      
+
+      // Store information used to display in the Info component
       activeSpace < 0.0 ? this.setState({ overloaded: true }) : this.setState({ overloaded: false })
       this.setState({ activeIndex, activeCurrent, activeSpace })
 
+      // Select the color the bar element upon clicking it
       let elementColor = chartElement._model.backgroundColor
       this.setElementColor(activeIndex, elementColor)
     }
@@ -254,6 +294,7 @@ class Home extends Component {
     let selectedNames = []
     let names = this.state.names
 
+    // Get the names of couriers that were selected
     for (let i = 0; i < selectedIndices.length; ++i) {
       let index = selectedIndices[i]
       selectedNames.push(names[index])
@@ -321,11 +362,6 @@ class Home extends Component {
       mergeClassColor = "red"
     }
 
-    // Redirect to root page if no file is received
-    if (!this.props.file) {
-      return <Redirect to="/"/>
-    }
-
     return (
       <div className="home-container">
         <div className="container-fluid">
@@ -375,5 +411,3 @@ class Home extends Component {
     )
   }
 }
-
-export default withRouter(Home)
