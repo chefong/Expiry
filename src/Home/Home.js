@@ -242,7 +242,7 @@ export default class Home extends Component {
     }
     else if (elementColor == darkGreenB) { // If the green bar element is deselected
       colors[activeIndex] = green
-      selectedIndices.splice(selectedIndices.indexOf(activeIndex))
+      selectedIndices.splice(selectedIndices.indexOf(activeIndex), 1)
       largestMax = this.setLargestMax(selectedIndices)
 
       selectedTotalLoad -= loadValue
