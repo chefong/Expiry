@@ -21,6 +21,8 @@ yarn start
 Navigate to localhost:3000 on a browser (if a browser window did not automatically open). This is what you should see.
 <p align="center"><img src="./src/assets/images/screenshot.png" width="90%"/></p>
 
+To test the application, you may upload the sample CSV files, which are located in the "data" directory.
+
 ## Functionality
 
 Filtering allows for displaying the couriers in a specified order.
